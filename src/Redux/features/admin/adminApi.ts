@@ -1,0 +1,93 @@
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { baseApi } from "../../api/baseApi";
+
+const adminApi = baseApi.injectEndpoints({
+   endpoints: (builder: any) => ({
+      // Get all users
+      getAllUsers: builder.query({
+         query: () => ({
+            url: "/users/all-user",
+            method: "GET",
+         }),
+         providesTags: ["users"],
+      }),
+      getAllBooks: builder.query({
+         query: () => ({
+            url: "/books/all",
+            method: "GET",
+         }),
+         providesTags: ["books"],
+      }),
+
+      // Get all admins
+      getAllAdmins: builder.query({
+         query: () => ({
+            url: "/users/all-admin",
+            method: "GET",
+         }),
+         providesTags: ["admins"],
+         transformResponse: (response: any) => response?.data,
+      }),
+
+      // Change user status (Active / Blocked)
+      changeStatus: builder.mutation({
+         query: (data: { id: string; status: string }) => ({
+            url: `/users/status/${data?.id}`,
+            method: "PATCH",
+            body: {
+               status: data?.status,
+            },
+         }),
+         invalidatesTags: ["users"],
+      }),
+
+      // Create admin
+      createAdmin: builder.mutation({
+         query: (data: any) => ({
+            url: "/users/create-user",
+            method: "POST",
+            body: data,
+         }),
+         invalidatesTags: ["admins", "users"],
+      }),
+
+      // Get single admin
+      getSingleAdmin: builder.query({
+         query: (id: string) => ({
+            url: `/users/admin/${id}`,
+            method: "GET",
+         }),
+         providesTags: ["admins"],
+      }),
+
+      // Delete admin
+      deleteAdmin: builder.mutation({
+         query: (id: string) => ({
+            url: `/users/admin/${id}`,
+            method: "DELETE",
+         }),
+         invalidatesTags: ["admins"],
+      }),
+
+      // Delete user
+      deleteUser: builder.mutation({
+         query: (id: string) => ({
+            url: `/users/${id}`,
+            method: "DELETE",
+         }),
+         invalidatesTags: ["users"],
+      }),
+   }),
+});
+
+export const {
+   useGetAllUsersQuery,
+   useGetAllAdminsQuery,
+   useChangeStatusMutation,
+   useCreateAdminMutation,
+   useGetSingleAdminQuery,
+   useDeleteAdminMutation,
+   useDeleteUserMutation,
+   useGetAllBooksQuery
+} = adminApi;
