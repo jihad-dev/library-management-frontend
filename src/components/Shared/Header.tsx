@@ -5,13 +5,12 @@ import { useAppDispatch, useAppSelector } from "../../Redux/hooks";
 import { logout } from "../../Redux/features/auth/authSlice";
 
 import {
-
   User,
   LayoutDashboard,
   LogOut,
   Menu,
   X,
-  UtensilsCrossed,
+  BookOpen,
   Receipt,
   ChevronDown,
 } from "lucide-react";
@@ -19,7 +18,6 @@ import {
 const Header = () => {
   const user = useAppSelector((state) => state.auth.user);
 
-  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -27,12 +25,10 @@ const Header = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  // Check if the user is an admin or superadmin (case-insensitive check)
   const isAdminOrSuperAdmin =
     user?.role?.toLowerCase() === "admin" ||
-    user?.role?.toLowerCase() === "superAdmin";
+    user?.role?.toLowerCase() === "superadmin";
 
-  // Handle Navbar Background Change on Scroll
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -60,11 +56,11 @@ const Header = () => {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="p-2 rounded-xl bg-amber-500 text-slate-950 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 shadow-lg shadow-amber-500/20">
-              <UtensilsCrossed className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="p-2 rounded-xl bg-indigo-600 text-white transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 shadow-lg shadow-indigo-600/20">
+              <BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <span className="text-xl sm:text-2xl font-black tracking-tight text-white group-hover:text-amber-400 transition-colors">
-              Foodie<span className="text-amber-500">Hub</span>
+            <span className="text-xl sm:text-2xl font-black tracking-tight text-white group-hover:text-indigo-400 transition-colors">
+              Library<span className="text-indigo-500">Hub</span>
             </span>
           </Link>
 
@@ -72,7 +68,7 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 bg-slate-800/50 p-1.5 rounded-full border border-slate-700/50 backdrop-blur-md">
             {[
               { path: "/", label: "Home" },
-              { path: "/items", label: "Menu" },
+              { path: "/books", label: "Catalog" },
               { path: "/about", label: "About Us" },
               { path: "/contact", label: "Contact" },
             ].map((item) => (
@@ -88,26 +84,23 @@ const Header = () => {
 
           {/* Action Icons & User Menu */}
           <div className="flex items-center gap-2 sm:gap-4">
-           
-            {/* Quick Access Admin Dashboard Icon */}
             {isAdminOrSuperAdmin && (
               <Link
                 to="/dashboard/admin-home"
-                className="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-amber-400 border border-slate-700/50 transition-all duration-200 hover:scale-105"
+                className="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-indigo-400 border border-slate-700/50 transition-all duration-200 hover:scale-105"
                 title="Admin Dashboard"
               >
                 <LayoutDashboard className="w-5 h-5" />
               </Link>
             )}
 
-            {/* Logged-In User Actions */}
             {user ? (
               <div className="relative">
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/50 transition-all duration-200"
                 >
-                  <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">
+                  <div className="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-sm">
                     {user?.name ? user.name[0].toUpperCase() : "U"}
                   </div>
                   <span className="hidden sm:inline text-xs font-semibold text-slate-200 max-w-[100px] truncate">
@@ -120,9 +113,8 @@ const Header = () => {
                   />
                 </button>
 
-                {/* Profile Dropdown */}
                 {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-52 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="absolute right-0 mt-2 w-52 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl py-2 z-50">
                     <div className="px-4 py-2 border-b border-slate-700/50">
                       <p className="text-xs text-slate-400">Signed in as</p>
                       <p className="text-xs font-bold text-white truncate">
@@ -133,24 +125,24 @@ const Header = () => {
                     <Link
                       to="/profile"
                       onClick={() => setIsProfileOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-300 hover:bg-slate-700/50 hover:text-amber-400 transition-colors"
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-300 hover:bg-slate-700/50 hover:text-indigo-400 transition-colors"
                     >
                       <User className="w-4 h-4" /> Profile
                     </Link>
 
                     <Link
-                      to="/my-order"
+                      to="/my-reservations"
                       onClick={() => setIsProfileOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-300 hover:bg-slate-700/50 hover:text-amber-400 transition-colors"
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-300 hover:bg-slate-700/50 hover:text-indigo-400 transition-colors"
                     >
-                      <Receipt className="w-4 h-4" /> My Orders
+                      <Receipt className="w-4 h-4" /> My Reservations
                     </Link>
 
                     {isAdminOrSuperAdmin && (
                       <Link
                         to="/dashboard/admin-home"
                         onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-amber-400 hover:bg-slate-700/50 transition-colors"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-indigo-400 hover:bg-slate-700/50 transition-colors"
                       >
                         <LayoutDashboard className="w-4 h-4" /> Admin Dashboard
                       </Link>
@@ -170,7 +162,7 @@ const Header = () => {
             ) : (
               <Link
                 to="/login"
-                className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs transition-all shadow-lg shadow-amber-500/20 hover:scale-105 active:scale-95"
+                className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-all shadow-lg shadow-indigo-600/20 hover:scale-105 active:scale-95"
               >
                 Login
               </Link>
@@ -192,11 +184,11 @@ const Header = () => {
 
         {/* Mobile Dropdown Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden mt-3 bg-slate-800/95 border border-slate-700/80 rounded-2xl p-4 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-3 duration-200">
+          <div className="md:hidden mt-3 bg-slate-800/95 border border-slate-700/80 rounded-2xl p-4 shadow-2xl backdrop-blur-xl">
             <div className="flex flex-col space-y-1">
               {[
                 { path: "/", label: "Home" },
-                { path: "/items", label: "Menu" },
+                { path: "/books", label: "Catalog" },
                 { path: "/about", label: "About Us" },
                 { path: "/contact", label: "Contact" },
               ].map((item) => (
@@ -204,7 +196,7 @@ const Header = () => {
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 transition-colors"
+                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-indigo-400 hover:bg-slate-700/50 transition-colors"
                 >
                   {item.label}
                 </Link>
@@ -214,16 +206,16 @@ const Header = () => {
                 <>
                   <div className="border-t border-slate-700/50 my-2 pt-2">
                     <Link
-                      to="/my-order"
+                      to="/my-reservations"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 flex items-center gap-2"
+                      className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-indigo-400 hover:bg-slate-700/50 flex items-center gap-2"
                     >
-                      <Receipt className="w-4 h-4" /> My Orders
+                      <Receipt className="w-4 h-4" /> My Reservations
                     </Link>
                     <Link
                       to="/profile"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-amber-400 hover:bg-slate-700/50 flex items-center gap-2"
+                      className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-indigo-400 hover:bg-slate-700/50 flex items-center gap-2"
                     >
                       <User className="w-4 h-4" /> Profile
                     </Link>
@@ -231,7 +223,7 @@ const Header = () => {
                       <Link
                         to="/dashboard/admin-home"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="px-4 py-2.5 rounded-xl text-xs font-semibold text-amber-400 hover:bg-slate-700/50 flex items-center gap-2"
+                        className="px-4 py-2.5 rounded-xl text-xs font-semibold text-indigo-400 hover:bg-slate-700/50 flex items-center gap-2"
                       >
                         <LayoutDashboard className="w-4 h-4" /> Dashboard
                       </Link>

@@ -52,7 +52,7 @@ export const router = createBrowserRouter([
       {
         path: "/profile",
         element: (
-          <PrivateRoute allowedRoles={["admin", "superAdmin", "user"]}>
+          <PrivateRoute allowedRoles={["librarian", "superAdmin", "member"]}>
             <Profile />
           </PrivateRoute>
         ),

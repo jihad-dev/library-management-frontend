@@ -6,7 +6,7 @@ interface PrivateRouteProps {
   allowedRoles?: string[]; // optional: কোন রোল অ্যাক্সেস পাবে
 }
 
-const PrivateRoute = ({ children, allowedRoles = ["admin", "user"] }: PrivateRouteProps) => {
+const PrivateRoute = ({ children, allowedRoles = ["librarian", "member"] }: PrivateRouteProps) => {
   const user = useAppSelector((state) => state.auth.user);
   const location = useLocation();
   if (!user) {
