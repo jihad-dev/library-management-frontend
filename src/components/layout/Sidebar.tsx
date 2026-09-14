@@ -22,7 +22,7 @@ import {
 
   Images,
 } from "lucide-react";
-import { useGetAllOrdersQuery } from "../../Redux/features/order/orderApi";
+
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks";
 import { logout } from "../../Redux/features/auth/authSlice";
 
@@ -161,15 +161,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  // RTK Query call
-  const { data: responseData } = useGetAllOrdersQuery(undefined);
-  const user = useAppSelector((state) => state.auth.user);
-  const pendingOrders = responseData?.data?.filter((order: any) => {
-    const status = order?.status?.toLowerCase();
-    return status === "pending" || status === "processing";
-  });
 
-  const pendingCount = pendingOrders?.length ?? 0;
+ 
+
 
   // TODO
   const navigationGroups: NavGroup[] = [
@@ -181,12 +175,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
           icon: <LayoutDashboard size={18} />,
           label: "Dashboard",
         },
-        {
-          to: "/dashboard/orders",
-          icon: <ShoppingCart size={18} />,
-          label: "Kitchen Orders",
-          badge: pendingCount > 0 ? pendingCount : undefined,
-        },
+      
       ],
     },
     {
@@ -303,12 +292,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
           <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-slate-900" />
         </div>
         <div className="flex flex-col min-w-0">
-          <span className="text-xs font-bold text-slate-100 truncate">
+          {/* <span className="text-xs font-bold text-slate-100 truncate">
             {user?.email}
           </span>
           <span className="capitalize text-[10px] font-medium text-amber-400">
             {user?.role}
-          </span>
+          </span> */}
         </div>
       </div>
       <button

@@ -12,6 +12,8 @@ import {
 
 const Profile = () => {
   const user = useAppSelector((state) => state.auth.user);
+  console.log(user);
+  
   const { data: singleUser } = useGetSingleUserQuery(user?.id);
 
   const containerVariants = {

@@ -15,6 +15,7 @@ import Preloader from "../utils/Preloader";
 import ViewUserInfo from "../Pages/AdminPage/ViewUserInfo";
 
 import Unauthorized from "../utils/Unauthorized";
+import AllBooks from "../Pages/All_Books/AllBooks";
 
 // Lazy Loaded Dashboard Components
 const Dashboard = lazy(() => import("../components/layout/Dashboard"));
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
         element: <Home />,
       },
       {
+        path: "/all-books",
+        element: <AllBooks />,
+      },
+      {
         path: "/login",
         element: <Login />,
       },
@@ -57,7 +62,7 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-     
+
       {
         path: "/about",
         element: <About />,
@@ -65,13 +70,13 @@ export const router = createBrowserRouter([
       {
         path: "/contact",
         element: <Contact />,
-      }
+      },
     ],
   },
   {
     path: "/dashboard",
     element: (
-      <PrivateRoute allowedRoles={["admin", "superAdmin"]}>
+      <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
         <Suspense fallback={<Preloader />}>
           <Dashboard />
         </Suspense>
@@ -81,7 +86,7 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/admin-home",
         element: (
-          <PrivateRoute allowedRoles={["admin", "superAdmin"]}>
+          <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
             <Suspense fallback={<Preloader />}>
               <AdminHome />
             </Suspense>
@@ -91,7 +96,7 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/all-items",
         element: (
-          <PrivateRoute allowedRoles={["admin", "superAdmin"]}>
+          <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
             <Suspense fallback={<Preloader />}>
               <AllFoods />
             </Suspense>
@@ -101,7 +106,7 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/customers",
         element: (
-          <PrivateRoute allowedRoles={["admin", "superAdmin"]}>
+          <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
             <Suspense fallback={<Preloader />}>
               <Customers />
             </Suspense>
@@ -187,13 +192,11 @@ export const router = createBrowserRouter([
             </Suspense>
           </PrivateRoute>
         ),
-      }
-  
-    ]
+      },
+    ],
   },
   {
     path: "/unauthorized",
     element: <Unauthorized />,
   },
- 
 ]);
