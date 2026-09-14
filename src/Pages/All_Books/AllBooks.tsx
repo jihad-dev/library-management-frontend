@@ -1,16 +1,26 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Filter, XCircle, Sparkles, Layers } from "lucide-react";
-import { useGetAllBooksQuery } from "../../Redux/features/admin/adminApi";
+ import { toast } from "sonner"; // 1. Sonner Import করুন
+
+import {
+  useGetAllBooksQuery,
+  useReserveBookMutation,
+} from "../../Redux/features/admin/adminApi";
 import BookCard, { TBook } from "../../utils/BookCard";
+import { useAppSelector } from "../../Redux/hooks";
+import { useNavigate } from "react-router-dom";
 
 const AllBooks: React.FC = () => {
+  const user = useAppSelector((state) => state.auth.user);
+  const navigate = useNavigate();
   const {
     data: bookResponse,
     isLoading,
     isError,
   } = useGetAllBooksQuery(undefined);
-
+  const [reserveBook, { isLoading: isReserving }] = useReserveBookMutation();
   // Local state for Search & Category filter
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -36,10 +46,31 @@ const AllBooks: React.FC = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const handleReserve = (book: TBook) => {
-    console.log("Reserved book:", book);
-  };
+ 
+  const handleReserve = async (book: TBook) => {
+    if (!user) {
+      toast.error("রিজার্ভ করতে প্রথমে লগইন করুন!");
+      return navigate("/login");
+    }
 
+    // 2. লোডিং টোস্ট দেখানোর জন্য ID সেট করা
+    const toastId = toast.loading("বইটি রিজার্ভ করা হচ্ছে...");
+
+    try {
+      await reserveBook(book.id).unwrap();
+      // 3. সফল হলে Success Toast
+      toast.success("বইটি সফলভাবে রিজার্ভ করা হয়েছে!", { id: toastId });
+    } catch (error: any) {
+      console.error("Reserve error:", error);
+      // 4. এরর আসলে ব্যাকএন্ড মেসেজ সহ Error Toast
+      const errorMsg =
+        error?.data?.detail ||
+        error?.data?.message ||
+        "রিজার্ভ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।";
+
+      toast.error(errorMsg, { id: toastId });
+    }
+  };
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 pt-28 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Page Header */}
@@ -142,7 +173,12 @@ const AllBooks: React.FC = () => {
         >
           <AnimatePresence>
             {filteredBooks.map((book) => (
-              <BookCard key={book.id} book={book} onReserve={handleReserve} />
+              <BookCard
+                key={book.id}
+                book={book}
+                onReserve={handleReserve}
+                isReserving={isReserving}
+              />
             ))}
           </AnimatePresence>
         </motion.div>

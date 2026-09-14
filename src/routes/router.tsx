@@ -12,16 +12,15 @@ import Profile from "../Pages/Profile/Profile";
 import About from "../Pages/About/About";
 import Contact from "../Pages/Contact/Contact";
 import Preloader from "../utils/Preloader";
-import ViewUserInfo from "../Pages/AdminPage/ViewUserInfo";
 
 import Unauthorized from "../utils/Unauthorized";
 import AllBooks from "../Pages/All_Books/AllBooks";
+import MyReservations from "../Pages/My-Reservations/My-reservations";
 
 // Lazy Loaded Dashboard Components
 const Dashboard = lazy(() => import("../components/layout/Dashboard"));
 const AdminHome = lazy(() => import("../Pages/AdminPage/AdminHome"));
 const ViewAllOrders = lazy(() => import("../Pages/AdminPage/ViewAllOrders"));
-const AllFoods = lazy(() => import("../Pages/AdminPage/AllProducts"));
 const ViewProductFullDetails = lazy(
   () => import("../Pages/AdminPage/ViewProductFullDetails"),
 );
@@ -31,6 +30,8 @@ const SalesAnalytics = lazy(() => import("../Pages/AdminPage/SalesAnalytics"));
 const Customers = lazy(() => import("../Pages/AdminPage/Customers"));
 const CreateAdmin = lazy(() => import("../Pages/AdminPage/CreateAdmin"));
 const AllAdmin = lazy(() => import("./../Pages/AdminPage/AllAdmin"));
+const ViewUserInfo = lazy(() => import("../Pages/AdminPage/ViewUserInfo"));
+const CreateIssue = lazy(() => import("../Pages/AdminPage/CreateIssue"));
 
 export const router = createBrowserRouter([
   {
@@ -62,7 +63,14 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-
+      {
+        path: "/my-reservations",
+        element: (
+          <PrivateRoute allowedRoles={["librarian", "superAdmin", "member"]}>
+            <MyReservations />
+          </PrivateRoute>
+        ),
+      },
       {
         path: "/about",
         element: <About />,
@@ -94,11 +102,11 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/dashboard/all-items",
+        path: "/dashboard/create-issue",
         element: (
           <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
             <Suspense fallback={<Preloader />}>
-              <AllFoods />
+              <CreateIssue />
             </Suspense>
           </PrivateRoute>
         ),
@@ -116,7 +124,7 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/customers/:id",
         element: (
-          <PrivateRoute allowedRoles={["admin", "superAdmin"]}>
+          <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
             <Suspense fallback={<Preloader />}>
               <ViewUserInfo />
             </Suspense>
@@ -126,7 +134,7 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/all-admin",
         element: (
-          <PrivateRoute allowedRoles={["admin", "superAdmin"]}>
+          <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
             <Suspense fallback={<Preloader />}>
               <AllAdmin />
             </Suspense>
@@ -136,7 +144,7 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/admin/create-admin",
         element: (
-          <PrivateRoute allowedRoles={["admin", "superAdmin"]}>
+          <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
             <Suspense fallback={<Preloader />}>
               <CreateAdmin />
             </Suspense>
@@ -146,7 +154,7 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/items/add-item",
         element: (
-          <PrivateRoute allowedRoles={["admin", "superAdmin"]}>
+          <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
             <Suspense fallback={<Preloader />}>
               <AddItemsForm />
             </Suspense>
@@ -156,7 +164,7 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/items/view-item/:id",
         element: (
-          <PrivateRoute allowedRoles={["admin", "superAdmin"]}>
+          <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
             <Suspense fallback={<Preloader />}>
               <ViewProductFullDetails />
             </Suspense>
@@ -166,7 +174,7 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/categories",
         element: (
-          <PrivateRoute allowedRoles={["admin", "superAdmin"]}>
+          <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
             <Suspense fallback={<Preloader />}>
               <AllCategories />
             </Suspense>
@@ -176,7 +184,7 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/orders",
         element: (
-          <PrivateRoute allowedRoles={["admin", "superAdmin"]}>
+          <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
             <Suspense fallback={<Preloader />}>
               <ViewAllOrders />
             </Suspense>
@@ -186,7 +194,7 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/sales-analytics",
         element: (
-          <PrivateRoute allowedRoles={["admin", "superAdmin"]}>
+          <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
             <Suspense fallback={<Preloader />}>
               <SalesAnalytics />
             </Suspense>

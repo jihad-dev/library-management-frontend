@@ -1,9 +1,8 @@
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseApi } from "../../api/baseApi";
 
 const adminApi = baseApi.injectEndpoints({
-   endpoints: (builder: any) => ({
+   endpoints: (builder) => ({
       // Get all users
       getAllUsers: builder.query({
          query: () => ({
@@ -12,12 +11,48 @@ const adminApi = baseApi.injectEndpoints({
          }),
          providesTags: ["users"],
       }),
+
       getAllBooks: builder.query({
          query: () => ({
             url: "/books/all",
             method: "GET",
          }),
          providesTags: ["books"],
+      }),
+
+      // Reserve Book Mutation
+      reserveBook: builder.mutation({
+         query: (bookId: string | number) => ({
+            url: `/reserve/${bookId}`,
+            method: "POST",
+         }),
+         invalidatesTags: ["books"],
+      }),
+
+      getMyReservations: builder.query({
+         query: () => ({
+            url: "/reserve/my",
+            method: "GET",
+         }),
+         providesTags: ["Reservation"],
+      }),
+
+      cancelReservation: builder.mutation({
+         query: (reservationId: string | number) => ({
+            url: `/reserve/cancel/${reservationId}`,
+            method: "DELETE",
+         }),
+         invalidatesTags: ["Reservation"],
+      }),
+
+      // Create Issue Mutation
+      createIssue: builder.mutation({
+         query: (data: { user_id: number; book_id: number }) => ({
+            url: "/admin/create_issue",
+            method: "POST",
+            body: data,
+         }),
+         invalidatesTags: ["Issue", "books", "Reservation"],
       }),
 
       // Get all admins
@@ -89,5 +124,9 @@ export const {
    useGetSingleAdminQuery,
    useDeleteAdminMutation,
    useDeleteUserMutation,
-   useGetAllBooksQuery
+   useGetAllBooksQuery,
+   useReserveBookMutation,
+   useGetMyReservationsQuery,
+   useCancelReservationMutation,
+   useCreateIssueMutation, 
 } = adminApi;

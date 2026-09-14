@@ -3,24 +3,25 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
-  Package,
-  ShoppingCart,
-  BarChart,
-  X,
-  ChevronDown,
-  ChevronRight,
-  Home,
+  BookOpen,
+  BookPlus,
+  BookmarkCheck,
+  History,
   Users2,
-  UtensilsCrossed,
-  Grid,
+  UserCheck,
   UsersRound,
+  BarChart,
   Ticket,
   Star,
   LogOut,
-  UserCheck,
   User,
-
   Images,
+  Home,
+  X,
+  ChevronDown,
+  ChevronRight,
+  Library,
+
 } from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks";
@@ -162,10 +163,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
- 
+  // Redux থেকে কারেন্ট ইউজার ডাটা রিড করা
+  const user = useAppSelector((state) => state.auth.user);
 
-
-  // TODO
+  // Library Management Navigation
   const navigationGroups: NavGroup[] = [
     {
       groupLabel: "Main Menu",
@@ -175,29 +176,40 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
           icon: <LayoutDashboard size={18} />,
           label: "Dashboard",
         },
-      
       ],
     },
     {
-      groupLabel: "Menu Management",
+      groupLabel: "Book Management",
       items: [
         {
-          to: "/dashboard/items",
-          icon: <Package size={18} />,
-          label: "Menu Items",
+          to: "/dashboard/books",
+          icon: <BookOpen size={18} />,
+          label: "Books",
           children: [
-            { to: "/dashboard/all-items", label: "All Dishes" },
-            { to: "/dashboard/items/add-item", label: "Add New Dish" },
+            { to: "/dashboard/all-books", label: "All Books" },
+            { to: "/dashboard/books/add-book", label: "Add New Book" },
+            { to: "/dashboard/categories", label: "Book Categories" },
           ],
         },
+      ],
+    },
+    {
+      groupLabel: "Circulation & Reservations",
+      items: [
         {
-          to: "/dashboard/categories",
-          icon: <Grid size={18} />,
-          label: "Categories",
-          children: [
-            { to: "/dashboard/categories", label: "All Categories" },
-            { to: "/dashboard/categories/add-category", label: "Add Category" },
-          ],
+          to: "/dashboard/create-issue",
+          icon: <BookPlus size={18} />,
+          label: "Issue Book",
+        },
+        {
+          to: "/dashboard/reservations",
+          icon: <BookmarkCheck size={18} />,
+          label: "Reservations",
+        },
+        {
+          to: "/dashboard/borrow-history",
+          icon: <History size={18} />,
+          label: "Borrow History",
         },
       ],
     },
@@ -207,42 +219,42 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
         {
           to: "/dashboard/customers",
           icon: <Users2 size={18} />,
-          label: "All Customers",
+          label: "All Members",
         },
         {
           to: "/dashboard/all-admin",
           icon: <UserCheck size={18} />,
-          label: "All Admins",
+          label: "All Librarians/Admins",
         },
         {
           to: "/dashboard/admin/create-admin",
           icon: <UsersRound size={18} />,
-          label: "Create Admin",
+          label: "Create Staff / Admin",
         },
       ],
     },
     {
-      groupLabel: "Marketing & Analytics",
+      groupLabel: "Reports & Content",
       items: [
         {
-          to: "/dashboard/sales-analytics",
+          to: "/dashboard/analytics",
           icon: <BarChart size={18} />,
-          label: "Sales Analytics",
+          label: "Library Analytics",
         },
         {
-          to: "/dashboard/coupons",
+          to: "/dashboard/fines",
           icon: <Ticket size={18} />,
-          label: "Coupons & Offers",
+          label: "Fines & Payments",
         },
         {
           to: "/dashboard/all-reviews",
           icon: <Star size={18} />,
-          label: "Customer Reviews",
+          label: "Book Reviews",
         },
         {
           to: "/dashboard/all-banners",
           icon: <Images size={18} />,
-          label: "All Banners",
+          label: "Banners & News",
         },
       ],
     },
@@ -252,7 +264,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
         {
           to: "/",
           icon: <Home size={18} />,
-          label: "Home",
+          label: "Public Home",
         },
       ],
     },
@@ -285,19 +297,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
     <div className="p-3.5 border-t border-slate-800/80 bg-slate-950/40 flex items-center justify-between">
       <div className="flex items-center gap-3">
         <div className="relative">
-          {/* Premium Styled Avatar Icon Wrapper */}
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500/20 via-slate-800 to-slate-800 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-sm shadow-amber-500/10">
             <User size={18} className="text-amber-400" />
           </div>
           <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-slate-900" />
         </div>
         <div className="flex flex-col min-w-0">
-          {/* <span className="text-xs font-bold text-slate-100 truncate">
-            {user?.email}
+          <span className="text-xs font-bold text-slate-100 truncate">
+            {user?.email || "Admin User"}
           </span>
           <span className="capitalize text-[10px] font-medium text-amber-400">
-            {user?.role}
-          </span> */}
+            {user?.role || "Librarian"}
+          </span>
         </div>
       </div>
       <button
@@ -348,10 +359,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
                   onClick={onClose}
                 >
                   <div className="p-2 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-slate-950 transition-transform duration-300 group-hover:rotate-12 shadow-md shadow-amber-500/20">
-                    <UtensilsCrossed className="w-5 h-5" />
+                    <Library className="w-5 h-5" />
                   </div>
                   <span className="text-xl font-extrabold tracking-tight text-white group-hover:text-amber-400 transition-colors">
-                    Foodie<span className="text-amber-400">Hub</span>
+                    Lib<span className="text-amber-400">Sys</span>
                   </span>
                 </Link>
               </div>
@@ -376,10 +387,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, isOpen, onClose }) => {
               className="flex items-center gap-2.5 group"
             >
               <div className="p-2 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-slate-950 transition-transform duration-300 group-hover:rotate-12 shadow-md shadow-amber-500/20">
-                <UtensilsCrossed className="w-5 h-5" />
+                <Library className="w-5 h-5" />
               </div>
               <span className="text-xl font-extrabold tracking-tight text-white group-hover:text-amber-400 transition-colors">
-                Foodie<span className="text-amber-400">Hub</span>
+                Lib<span className="text-amber-400">Sys</span>
               </span>
             </Link>
           </div>

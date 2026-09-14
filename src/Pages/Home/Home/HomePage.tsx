@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner"; // 1. Sonner Import করুন
+
 import {
   BookOpen,
   Search,
@@ -15,6 +17,9 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import BookCard, { TBook } from "../../../utils/BookCard";
+import { useAppSelector } from "../../../Redux/hooks";
+import { useNavigate } from "react-router-dom";
+import { useReserveBookMutation } from "../../../Redux/features/admin/adminApi";
 
 // Props interface definition
 interface HomePageProps {
@@ -30,6 +35,7 @@ const HomePage: React.FC<HomePageProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const user = useAppSelector((state) => state.auth.user);
 
   // ডাটা Safely এক্সট্র্যাক্ট করা
   const books: TBook[] = Array.isArray(booksData)
@@ -53,13 +59,35 @@ const HomePage: React.FC<HomePageProps> = ({
       selectedCategory === "All" || book.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+  const navigate = useNavigate();
+  const [reserveBook, { isLoading: isReserving }] = useReserveBookMutation();
 
-  const handleReserve = (book: TBook) => {
-    console.log("Book Reserved:", book);
+  const handleReserve = async (book: TBook) => {
+    if (!user) {
+      toast.error("রিজার্ভ করতে প্রথমে লগইন করুন!");
+      return navigate("/login");
+    }
+
+    // 2. লোডিং টোস্ট দেখানোর জন্য ID সেট করা
+    const toastId = toast.loading("বইটি রিজার্ভ করা হচ্ছে...");
+
+    try {
+      await reserveBook(book.id).unwrap();
+      // 3. সফল হলে Success Toast
+      toast.success("বইটি সফলভাবে রিজার্ভ করা হয়েছে!", { id: toastId });
+    } catch (error: any) {
+      console.error("Reserve error:", error);
+      // 4. এরর আসলে ব্যাকএন্ড মেসেজ সহ Error Toast
+      const errorMsg =
+        error?.data?.detail ||
+        error?.data?.message ||
+        "রিজার্ভ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।";
+
+      toast.error(errorMsg, { id: toastId });
+    }
   };
-
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white font-sans overflow-hidden">
+    <div className="min-h-screen bg-[#020618] text-slate-100 selection:bg-indigo-500 selection:text-white font-sans overflow-hidden">
       {/* ----------------- Hero Section ----------------- */}
       <section className="relative pt-14 pb-36 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center justify-center min-h-[85vh]">
         {/* Dynamic Background Glowing Orbs */}
@@ -292,7 +320,12 @@ const HomePage: React.FC<HomePageProps> = ({
           >
             <AnimatePresence>
               {filteredBooks.map((book) => (
-                <BookCard key={book.id} book={book} onReserve={handleReserve} />
+                <BookCard
+                  key={book.id}
+                  book={book}
+                  onReserve={handleReserve}
+                  isReserving={isReserving}
+                />
               ))}
             </AnimatePresence>
           </motion.div>

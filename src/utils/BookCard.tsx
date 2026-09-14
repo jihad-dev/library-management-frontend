@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, XCircle, ArrowRight } from "lucide-react";
+import { CheckCircle2, XCircle, ArrowRight, Loader2 } from "lucide-react";
 
 export interface TBook {
   id: number;
@@ -19,9 +19,14 @@ export interface TBook {
 interface BookCardProps {
   book: TBook;
   onReserve?: (book: TBook) => void;
+  isReserving?: boolean; // ✅ লোডিং চেক করার জন্য নতুন প্রপস
 }
 
-const BookCard: React.FC<BookCardProps> = ({ book, onReserve }) => {
+const BookCard: React.FC<BookCardProps> = ({
+  book,
+  onReserve,
+  isReserving = false,
+}) => {
   const isAvailable = book.available_copies > 0;
 
   return (
@@ -35,14 +40,14 @@ const BookCard: React.FC<BookCardProps> = ({ book, onReserve }) => {
     >
       <div>
         {/* Cover Image */}
-        <div className="relative  overflow-hidden bg-slate-800">
+        <div className="relative overflow-hidden bg-slate-800">
           <img
             src={
               book.cover_image ||
               "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80"
             }
             alt={book.title}
-            className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500 "
+            className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
 
@@ -89,23 +94,32 @@ const BookCard: React.FC<BookCardProps> = ({ book, onReserve }) => {
             ) : (
               <>
                 <XCircle className="w-4 h-4 text-rose-400" />
-                <span className="text-rose-400 font-medium">
-                  Out of Stock
-                </span>
+                <span className="text-rose-400 font-medium">Out of Stock</span>
               </>
             )}
           </div>
 
+          {/* ✅ Loading State সহ আপডেট করা Reserve Button */}
           <button
-            disabled={!isAvailable}
+            disabled={!isAvailable || isReserving}
             onClick={() => onReserve && onReserve(book)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-              isAvailable
-                ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30"
-                : "bg-slate-800 text-slate-500 cursor-not-allowed"
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
+              !isAvailable || isReserving
+                ? "bg-slate-800 text-slate-500 cursor-not-allowed opacity-70"
+                : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 cursor-pointer"
             }`}
           >
-            Reserve <ArrowRight className="w-3.5 h-3.5" />
+            {isReserving ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-300" />
+                <span>Reserving...</span>
+              </>
+            ) : (
+              <>
+                <span>Reserve</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </>
+            )}
           </button>
         </div>
       </div>
