@@ -26,7 +26,7 @@ const adminApi = baseApi.injectEndpoints({
             url: `/reserve/${bookId}`,
             method: "POST",
          }),
-         invalidatesTags: ["books"],
+         invalidatesTags: ["books", "Reservation"],
       }),
 
       getMyReservations: builder.query({

@@ -1,3 +1,4 @@
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { motion } from "framer-motion";
@@ -19,7 +20,7 @@ export interface TBook {
 interface BookCardProps {
   book: TBook;
   onReserve?: (book: TBook) => void;
-  isReserving?: boolean; // ✅ লোডিং চেক করার জন্য নতুন প্রপস
+  isReserving?: boolean;
 }
 
 const BookCard: React.FC<BookCardProps> = ({
@@ -42,11 +43,8 @@ const BookCard: React.FC<BookCardProps> = ({
         {/* Cover Image */}
         <div className="relative overflow-hidden bg-slate-800">
           <img
-            src={
-              book.cover_image ||
-              "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80"
-            }
-            alt={book.title}
+            src={book?.cover_image}
+            alt={book?.title}
             className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
@@ -99,20 +97,27 @@ const BookCard: React.FC<BookCardProps> = ({
             )}
           </div>
 
-          {/* ✅ Loading State সহ আপডেট করা Reserve Button */}
+          {/* ✅ Out of Stock হলে বাটন ডিজেবল ও আউট অফ স্টক দেখাবে */}
           <button
             disabled={!isAvailable || isReserving}
             onClick={() => onReserve && onReserve(book)}
             className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
-              !isAvailable || isReserving
-                ? "bg-slate-800 text-slate-500 cursor-not-allowed opacity-70"
-                : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 cursor-pointer"
+              !isAvailable
+                ? "bg-rose-500/10 text-rose-400 border border-rose-500/20 cursor-not-allowed"
+                : isReserving
+                  ? "bg-slate-800 text-slate-500 cursor-not-allowed opacity-70"
+                  : "bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 cursor-pointer"
             }`}
           >
             {isReserving ? (
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-300" />
                 <span>Reserving...</span>
+              </>
+            ) : !isAvailable ? (
+              <>
+                <XCircle className="w-3.5 h-3.5 text-rose-400" />
+                <span>Out of Stock</span>
               </>
             ) : (
               <>

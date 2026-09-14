@@ -16,6 +16,7 @@ import Preloader from "../utils/Preloader";
 import Unauthorized from "../utils/Unauthorized";
 import AllBooks from "../Pages/All_Books/AllBooks";
 import MyReservations from "../Pages/My-Reservations/My-reservations";
+import AddBook from "../Pages/AdminPage/AddBook";
 
 // Lazy Loaded Dashboard Components
 const Dashboard = lazy(() => import("../components/layout/Dashboard"));
@@ -25,7 +26,7 @@ const ViewProductFullDetails = lazy(
   () => import("../Pages/AdminPage/ViewProductFullDetails"),
 );
 const AddItemsForm = lazy(() => import("../Pages/AdminPage/AddProduct"));
-const AllCategories = lazy(() => import("../Pages/AdminPage/AllCategories"));
+
 const SalesAnalytics = lazy(() => import("../Pages/AdminPage/SalesAnalytics"));
 const Customers = lazy(() => import("../Pages/AdminPage/Customers"));
 const CreateAdmin = lazy(() => import("../Pages/AdminPage/CreateAdmin"));
@@ -172,11 +173,21 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/dashboard/categories",
+        path: "/dashboard/all-books",
         element: (
           <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
             <Suspense fallback={<Preloader />}>
-              <AllCategories />
+              < AllBooks/>
+            </Suspense>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/dashboard/books/add-book",
+        element: (
+          <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
+            <Suspense fallback={<Preloader />}>
+              < AddBook/>
             </Suspense>
           </PrivateRoute>
         ),
