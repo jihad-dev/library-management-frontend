@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Filter, XCircle, Sparkles, Layers } from "lucide-react";
- import { toast } from "sonner"; // 1. Sonner Import করুন
+import { toast } from "sonner";
 
 import {
   useGetAllBooksQuery,
@@ -20,10 +20,16 @@ const AllBooks: React.FC = () => {
     isLoading,
     isError,
   } = useGetAllBooksQuery(undefined);
-  const [reserveBook, { isLoading: isReserving }] = useReserveBookMutation();
+  const [reserveBook] = useReserveBookMutation();
+
   // Local state for Search & Category filter
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+
+  // 特定 বইয়ের লোডিং স্টেট ট্র্যাক করার জন্য ID স্টেট
+  const [reservingBookId, setReservingBookId] = useState<
+    string | number | null
+  >(null);
 
   // Extract books array safely (supports both direct array or wrapped data object)
   const books: TBook[] = Array.isArray(bookResponse)
@@ -45,32 +51,34 @@ const AllBooks: React.FC = () => {
       selectedCategory === "All" || book.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+const handleReserve = async (book: TBook) => {
+  if (!user) {
+    toast.error("রিজার্ভ করতে প্রথমে লগইন করুন!");
+    return navigate("/login");
+  }
+  const targetId = book.id;
+  if (!targetId) {
+    toast.error("বইয়ের ID পাওয়া যায়নি!");
+    return;
+  }
+  setReservingBookId(targetId);
+  const toastId = toast.loading("বইটি রিজার্ভ করা হচ্ছে...");
+  try {
+    await reserveBook(targetId).unwrap();
+    toast.success("বইটি সফলভাবে রিজার্ভ করা হয়েছে!", { id: toastId });
+  } catch (error: any) {
+    console.error("Reserve error:", error);
+    const errorMsg =
+      error?.data?.detail ||
+      error?.data?.message ||
+      "রিজার্ভ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।";
 
- 
-  const handleReserve = async (book: TBook) => {
-    if (!user) {
-      toast.error("রিজার্ভ করতে প্রথমে লগইন করুন!");
-      return navigate("/login");
-    }
+    toast.error(errorMsg, { id: toastId });
+  } finally {
+    setReservingBookId(null);
+  }
+};
 
-    // 2. লোডিং টোস্ট দেখানোর জন্য ID সেট করা
-    const toastId = toast.loading("বইটি রিজার্ভ করা হচ্ছে...");
-
-    try {
-      await reserveBook(book.id).unwrap();
-      // 3. সফল হলে Success Toast
-      toast.success("বইটি সফলভাবে রিজার্ভ করা হয়েছে!", { id: toastId });
-    } catch (error: any) {
-      console.error("Reserve error:", error);
-      // 4. এরর আসলে ব্যাকএন্ড মেসেজ সহ Error Toast
-      const errorMsg =
-        error?.data?.detail ||
-        error?.data?.message ||
-        "রিজার্ভ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।";
-
-      toast.error(errorMsg, { id: toastId });
-    }
-  };
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 pt-28 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Page Header */}
@@ -165,7 +173,7 @@ const AllBooks: React.FC = () => {
         </div>
       )}
 
-      {/* Books Card Grid - BookCard Component Render */}
+      {/* Books Card Grid */}
       {!isLoading && !isError && filteredBooks.length > 0 && (
         <motion.div
           layout
@@ -177,7 +185,8 @@ const AllBooks: React.FC = () => {
                 key={book.id}
                 book={book}
                 onReserve={handleReserve}
-                isReserving={isReserving}
+                // ✅ String() দিয়ে উভয় ID রূপান্তর করে তুলনা নিশ্চিত করা হয়েছে
+                isReserving={String(reservingBookId) === String(book.id)}
               />
             ))}
           </AnimatePresence>

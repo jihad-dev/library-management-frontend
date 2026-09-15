@@ -1,11 +1,10 @@
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2, XCircle, ArrowRight, Loader2 } from "lucide-react";
 
 export interface TBook {
-  id: number;
+  id: string | number; // ✅ string এবং number দুটোই এলাউ করা হলো
   title: string;
   description: string;
   price: number;
@@ -16,7 +15,6 @@ export interface TBook {
   available_copies: number;
   created_at?: string;
 }
-
 interface BookCardProps {
   book: TBook;
   onReserve?: (book: TBook) => void;

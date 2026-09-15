@@ -1,6 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseApi } from "../../api/baseApi";
-
+export interface CreateBookPayload {
+   title: string;
+   author: string;
+   description: string;
+   category: string;
+   price: number;
+   total_copies: number;
+   cover_image: string;
+   created_at?: string;
+}
+export interface UpdateBookPayload {
+  id?: number | string;
+  title?: string;
+  author?: string;
+  description?: string;
+  category?: string;
+  price?: number;
+  total_copies?: number;
+  available_copies?: number;
+  cover_image?: string;
+}
 const adminApi = baseApi.injectEndpoints({
    endpoints: (builder) => ({
       // Get all users
@@ -11,13 +31,38 @@ const adminApi = baseApi.injectEndpoints({
          }),
          providesTags: ["users"],
       }),
-
+      createBook: builder.mutation<any, CreateBookPayload>({
+         query: (bookData) => ({
+            url: "/admin/create_book",
+            method: "POST",
+            body: bookData,
+         }),
+         invalidatesTags: ["books"], // Automatically updates book lists across the app
+      }),
       getAllBooks: builder.query({
          query: () => ({
             url: "/books/all",
             method: "GET",
          }),
          providesTags: ["books"],
+      }),
+      // 1. Delete Book Mutation
+      deleteBook: builder.mutation<{ success: boolean; message?: string }, number | string>({
+         query: (bookId) => ({
+            url: `/admin/delete_book/${bookId}`, // Adjust URL path to match your backend route
+            method: "DELETE",
+         }),
+         invalidatesTags: ["books"], // Automatically refetches getAllBooks
+      }),
+
+      // 2. Update Book Mutation
+      updateBook: builder.mutation<any, UpdateBookPayload>({
+         query: ({ id, ...updatedData }) => ({
+            url: `/admin/update_book/${id}`, // Adjust URL path to match your backend route
+            method: "PUT", // Or "PATCH" depending on backend implementation
+            body: updatedData,
+         }),
+         invalidatesTags: ["books"], // Automatically refetches getAllBooks
       }),
 
       // Reserve Book Mutation
@@ -54,7 +99,13 @@ const adminApi = baseApi.injectEndpoints({
          }),
          invalidatesTags: ["Issue", "books", "Reservation"],
       }),
-
+      getMyIssuedBooks: builder.query({
+         query: () => ({
+            url: "/my_issued_books",
+            method: "GET",
+         }),
+         providesTags: ["Issue"],
+      }),
       // Get all admins
       getAllAdmins: builder.query({
          query: () => ({
@@ -128,5 +179,9 @@ export const {
    useReserveBookMutation,
    useGetMyReservationsQuery,
    useCancelReservationMutation,
-   useCreateIssueMutation, 
+   useCreateIssueMutation,
+   useGetMyIssuedBooksQuery,
+   useCreateBookMutation,
+   useDeleteBookMutation,
+   useUpdateBookMutation
 } = adminApi;

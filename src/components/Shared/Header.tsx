@@ -127,6 +127,13 @@ const Header = () => {
                     >
                       <Receipt className="w-4 h-4" /> My Reservations
                     </Link>
+                    <Link
+                      to="/my-issued-book"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-indigo-400 transition-colors"
+                    >
+                      <Receipt className="w-4 h-4" /> My Issued Book
+                    </Link>
 
                     {isAdminOrSuperAdmin && (
                       <Link
@@ -197,6 +204,7 @@ const Header = () => {
                     >
                       <Receipt className="w-4 h-4" /> My Reservations
                     </Link>
+                  
                     <Link
                       to="/profile"
                       onClick={() => setIsMobileMenuOpen(false)}

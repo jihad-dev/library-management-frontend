@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "sonner"; // 1. Sonner Import করুন
+import { toast } from "sonner";
 
 import {
   BookOpen,
@@ -21,7 +21,6 @@ import { useAppSelector } from "../../../Redux/hooks";
 import { useNavigate } from "react-router-dom";
 import { useReserveBookMutation } from "../../../Redux/features/admin/adminApi";
 
-// Props interface definition
 interface HomePageProps {
   booksData?: any;
   isLoading: boolean;
@@ -35,7 +34,13 @@ const HomePage: React.FC<HomePageProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+
+  // ✅ নির্দিষ্ট বইটির লোডিং ট্র্যাক করার জন্য স্টেট
+  const [reservingId, setReservingId] = useState<string | number | null>(null);
+
   const user = useAppSelector((state) => state.auth.user);
+  const navigate = useNavigate();
+  const [reserveBook] = useReserveBookMutation();
 
   // ডাটা Safely এক্সট্র্যাক্ট করা
   const books: TBook[] = Array.isArray(booksData)
@@ -59,8 +64,6 @@ const HomePage: React.FC<HomePageProps> = ({
       selectedCategory === "All" || book.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-  const navigate = useNavigate();
-  const [reserveBook, { isLoading: isReserving }] = useReserveBookMutation();
 
   const handleReserve = async (book: TBook) => {
     if (!user) {
@@ -68,24 +71,34 @@ const HomePage: React.FC<HomePageProps> = ({
       return navigate("/login");
     }
 
-    // 2. লোডিং টোস্ট দেখানোর জন্য ID সেট করা
+    const targetId = book.id ?? (book as any)._id;
+
+    if (!targetId) {
+      toast.error("বইয়ের ID পাওয়া যায়নি!");
+      return;
+    }
+
+    // ✅ লোডিং শুরু: ক্লিক করা বইটির ID সেট করা হলো
+    setReservingId(targetId);
     const toastId = toast.loading("বইটি রিজার্ভ করা হচ্ছে...");
 
     try {
-      await reserveBook(book.id).unwrap();
-      // 3. সফল হলে Success Toast
+      await reserveBook(targetId).unwrap();
       toast.success("বইটি সফলভাবে রিজার্ভ করা হয়েছে!", { id: toastId });
     } catch (error: any) {
       console.error("Reserve error:", error);
-      // 4. এরর আসলে ব্যাকএন্ড মেসেজ সহ Error Toast
       const errorMsg =
         error?.data?.detail ||
         error?.data?.message ||
-        "রিজার্ভ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।";
+        "রিজার্ভ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।";
 
       toast.error(errorMsg, { id: toastId });
+    } finally {
+      // ✅ লোডিং শেষ: আইডি রিসেট করা হলো
+      setReservingId(null);
     }
   };
+
   return (
     <div className="min-h-screen bg-[#020618] text-slate-100 selection:bg-indigo-500 selection:text-white font-sans overflow-hidden">
       {/* ----------------- Hero Section ----------------- */}
@@ -95,7 +108,7 @@ const HomePage: React.FC<HomePageProps> = ({
         <div className="absolute top-1/3 left-10 w-72 h-72 bg-blue-600/15 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-10 right-10 w-80 h-80 bg-purple-600/15 rounded-full blur-[120px] pointer-events-none" />
 
-        {/* Floating Accent Badges (Hidden on mobile) */}
+        {/* Floating Accent Badges */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
@@ -319,14 +332,23 @@ const HomePage: React.FC<HomePageProps> = ({
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
           >
             <AnimatePresence>
-              {filteredBooks.map((book) => (
-                <BookCard
-                  key={book.id}
-                  book={book}
-                  onReserve={handleReserve}
-                  isReserving={isReserving}
-                />
-              ))}
+              {filteredBooks.map((book) => {
+                const bookId = book.id ?? (book as any)._id;
+                // ✅ শুধুমাত্র নির্দিষ্ট বইটির সাথে আইডি মিললেই isReserving true হবে
+                const isThisReserving =
+                  reservingId !== null &&
+                  reservingId !== undefined &&
+                  String(reservingId) === String(bookId);
+
+                return (
+                  <BookCard
+                    key={bookId}
+                    book={book}
+                    onReserve={handleReserve}
+                    isReserving={isThisReserving}
+                  />
+                );
+              })}
             </AnimatePresence>
           </motion.div>
         )}

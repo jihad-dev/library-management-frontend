@@ -14,9 +14,11 @@ import Contact from "../Pages/Contact/Contact";
 import Preloader from "../utils/Preloader";
 
 import Unauthorized from "../utils/Unauthorized";
-import AllBooks from "../Pages/All_Books/AllBooks";
 import MyReservations from "../Pages/My-Reservations/My-reservations";
 import AddBook from "../Pages/AdminPage/AddBook";
+import MyIssuedBook from "../Pages/My-Issued-Book/My-issued-book";
+import AllBooks from "../Pages/All_Books/AllBooks";
+import ViewAllBooks from "../Pages/AdminPage/AllBooks";
 
 // Lazy Loaded Dashboard Components
 const Dashboard = lazy(() => import("../components/layout/Dashboard"));
@@ -69,6 +71,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute allowedRoles={["librarian", "superAdmin", "member"]}>
             <MyReservations />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/my-issued-book",
+        element: (
+          <PrivateRoute allowedRoles={["librarian", "superAdmin", "member"]}>
+            <MyIssuedBook />
           </PrivateRoute>
         ),
       },
@@ -177,7 +187,7 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute allowedRoles={["librarian", "superAdmin"]}>
             <Suspense fallback={<Preloader />}>
-              < AllBooks/>
+             <ViewAllBooks/>
             </Suspense>
           </PrivateRoute>
         ),
